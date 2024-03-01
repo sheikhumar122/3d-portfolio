@@ -1,29 +1,49 @@
 import { Canvas } from "@react-three/fiber";
 import { Suspense, useEffect, useRef, useState } from "react";
-
+import Kashmiri1 from "../assets/Kashmiri1.mp3";
 import sakura from "../assets/sakura.mp3";
-import { HomeInfo, Loader } from "../components";
+import { HomeInfo, KashmirInfo, Loader } from "../components";
 import { soundoff, soundon } from "../assets/icons";
-import { Bird, Island, Plane, Sky } from "../models";
+import { Bird, Helicopter, Island, Mountain, Plane, Sky } from "../models";
 
 const Home = () => {
-  const audioRef = useRef(new Audio(sakura));
-  audioRef.current.volume = 0.4;
-  audioRef.current.loop = true;
+  const audioRefSakura = useRef(new Audio(sakura));
+  const audioRefKashmiri = useRef(new Audio(Kashmiri1));
+
+  audioRefSakura.current.volume = 0.4;
+  audioRefSakura.current.loop = true;
+  audioRefKashmiri.current.volume = 0.4;
+  audioRefKashmiri.current.loop = true;
 
   const [currentStage, setCurrentStage] = useState(1);
   const [isRotating, setIsRotating] = useState(false);
-  const [isPlayingMusic, setIsPlayingMusic] = useState(false);
+  const [isPlayingSakura, setIsPlayingSakura] = useState(false);
+  const [isPlayingKashmiri, setIsPlayingKashmiri] = useState(false);
 
   useEffect(() => {
-    if (isPlayingMusic) {
-      audioRef.current.play();
+    if (isPlayingSakura) {
+      audioRefSakura.current.play();
+    } else {
+      audioRefSakura.current.pause();
     }
 
     return () => {
-      audioRef.current.pause();
+      audioRefSakura.current.pause();
     };
-  }, [isPlayingMusic]);
+  }, [isPlayingSakura]);
+
+  useEffect(() => {
+    if (isPlayingKashmiri) {
+      audioRefKashmiri.current.play();
+    } else {
+      audioRefKashmiri.current.pause();
+    }
+
+    return () => {
+      audioRefKashmiri.current.pause();
+    };
+  }, [isPlayingKashmiri]);
+
 
   const adjustBiplaneForScreenSize = () => {
     let screenScale, screenPosition;
@@ -58,61 +78,102 @@ const Home = () => {
   const [islandScale, islandPosition] = adjustIslandForScreenSize();
 
   return (
-    <section className='w-full h-screen relative'>
-      <div className='absolute top-28 left-0 right-0 z-10 flex items-center justify-center'>
-        {currentStage && <HomeInfo currentStage={currentStage} />}
-      </div>
+    <div>
+      <section className="w-full h-screen relative">
+        <div className="absolute top-28 left-0 right-0 z-10 flex items-center justify-center">
+          {currentStage && <HomeInfo currentStage={currentStage} />}
+        </div>
 
-      <Canvas
-        className={`w-full h-screen bg-transparent ${
-          isRotating ? "cursor-grabbing" : "cursor-grab"
-        }`}
-        camera={{ near: 0.1, far: 1000 }}
-      >
-        <Suspense fallback={<Loader />}>
-          <directionalLight position={[1, 1, 1]} intensity={2} />
-          <ambientLight intensity={0.5} />
-          <pointLight position={[10, 5, 10]} intensity={2} />
-          <spotLight
-            position={[0, 50, 10]}
-            angle={0.15}
-            penumbra={1}
-            intensity={2}
-          />
-          <hemisphereLight
-            skyColor='#b1e1ff'
-            groundColor='#000000'
-            intensity={1}
-          />
+        <Canvas
+          className={`w-full h-screen bg-transparent ${
+            isRotating ? "cursor-grabbing" : "cursor-grab"
+          }`}
+          camera={{ near: 0.1, far: 1000 }}
+        >
+          <Suspense fallback={<Loader />}>
+            <directionalLight position={[1, 1, 1]} intensity={2} />
+            <ambientLight intensity={0.3} />
+            <pointLight position={[10, 5, 10]} intensity={2} />
+            <spotLight
+              position={[0, 50, 10]}
+              angle={0.15}
+              penumbra={1}
+              intensity={2}
+            />
+            <hemisphereLight
+              skyColor="#b1e1ff"
+              groundColor="#000000"
+              intensity={1}
+            />
 
-          <Bird />
-          <Sky isRotating={isRotating} />
-          <Island
-            isRotating={isRotating}
-            setIsRotating={setIsRotating}
-            setCurrentStage={setCurrentStage}
-            position={islandPosition}
-            rotation={[0.1, 4.7077, 0]}
-            scale={islandScale}
-          />
-          <Plane
-            isRotating={isRotating}
-            position={biplanePosition}
-            rotation={[0, 20.1, 0]}
-            scale={biplaneScale}
-          />
-        </Suspense>
-      </Canvas>
+            <Bird />
+            <Sky isRotating={isRotating} />
+            <Island
+              isRotating={isRotating}
+              setIsRotating={setIsRotating}
+              setCurrentStage={setCurrentStage}
+              position={islandPosition}
+              rotation={[0.1, 4.7077, 0]}
+              scale={islandScale}
+            />
+            <Plane
+              isRotating={isRotating}
+              position={biplanePosition}
+              rotation={[0, 20.1, 0]}
+              scale={biplaneScale}
+            />
+          </Suspense>
+        </Canvas>
 
-      <div className='absolute bottom-2 left-2'>
-        <img
-          src={!isPlayingMusic ? soundoff : soundon}
-          alt='jukebox'
-          onClick={() => setIsPlayingMusic(!isPlayingMusic)}
-          className='w-10 h-10 cursor-pointer object-contain'
-        />
-      </div>
-    </section>
+        <div className="absolute bottom-2 left-2">
+          <img
+            src={!isPlayingSakura ? soundoff : soundon}
+            alt="jukebox"
+            onClick={() => setIsPlayingSakura(!isPlayingSakura)}
+            className="w-10 h-10 cursor-pointer object-contain"
+          />
+        </div>
+      </section>
+      {/* Separate Section for Mountain */}
+      <section className="w-full h-screen relative">
+        <div className="absolute top-28 left-0 right-0 z-10 flex items-center justify-center">
+          {currentStage && <KashmirInfo currentStage={currentStage} />}
+        </div>
+        <Canvas
+          className="w-full h-full"
+          camera={{ position: [0, 1, 7], near: 0.1, far: 100 }}
+        >
+          <Suspense fallback={<Loader />}>
+            <directionalLight position={[1, 1, 1]} intensity={2} />
+            <ambientLight intensity={0.5} />
+            <pointLight position={[10, 5, 10]} intensity={2} />
+            <spotLight
+              position={[0, 50, 10]}
+              angle={0.15}
+              penumbra={1}
+              intensity={2}
+            />
+
+            <Mountain
+              setIsRotating={setIsRotating}
+              isRotating={isRotating}
+              setCurrentStage={setCurrentStage}
+            />
+  <Helicopter />
+             
+          </Suspense>
+        </Canvas>
+        
+        <div className="absolute bottom-2 left-2">
+          <img
+            src={!isPlayingKashmiri ? soundoff : soundon}
+            alt="jukebox"
+            onClick={() => setIsPlayingKashmiri(!isPlayingKashmiri)}
+            className="w-10 h-10 cursor-pointer object-contain"
+          />
+        </div>
+      </section>
+    </div>
   );
 };
 
